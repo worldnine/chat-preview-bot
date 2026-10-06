@@ -1,12 +1,19 @@
-# gyazo-chat-bot
+# chat-preview-bot
 
-Google ChatでGyazoのURLを貼ると画像をプレビュー表示するBot。Google Apps Scriptで動作します。
+Google ChatにURLを貼ると、画像や本文をプレビュー表示するBot。Gyazo、X（Twitter）、YouTubeのほか、oEmbedかOGPに対応したサイトなら展開できます。Google Apps Scriptで動作します。
 
 ## 機能
 
-- GyazoのURLをそのまま貼る → 1枚インラインプレビュー
-- `/gyazo URL1 URL2 ...` → 複数枚対応
-- `@Gyazo Bot URL1 URL2 ...` → 複数枚対応
+- リンクプレビューに登録したドメインのURLをそのまま貼る → 1件インラインプレビュー
+- `/preview URL1 URL2 ...` → どのサイトのURLでも展開（最大5件）。コマンドの発言は本人にしか見えないので、`/preview`の後ろの文章を本人の発言として投稿し直し、その下にカードを付ける
+- `@preview URL1 URL2 ...` → どのサイトのURLでも展開（最大5件）
+
+| URL | 表示内容 |
+|---|---|
+| Gyazo、画像のURL | 画像 |
+| X（Twitter）の投稿 | 投稿者と本文 |
+| YouTubeなどoEmbedに対応したサイト | タイトル、作者、サムネイル |
+| その他のサイト | OGPのタイトル、説明文、画像 |
 
 ## セットアップ
 
@@ -32,13 +39,13 @@ Google ChatでGyazoのURLを貼ると画像をプレビュー表示するBot。G
 - **インタラクティブ機能**：有効
 - **機能**：「スペースとグループの会話に参加する」にチェック
 - **接続設定**：Apps Script → テストデプロイIDを入力
-- **リンクプレビュー**：`gyazo.com` と `*.gyazo.com` を追加
-- **スラッシュコマンド**：`/gyazo`（コマンドID: 1）を追加
+- **リンクプレビュー**：`gyazo.com`、`*.gyazo.com`、`x.com`、`twitter.com`を追加（登録できるのは5パターンまで）
+- **スラッシュコマンド**：`/preview`（コマンドID: 1）を追加
 - **公開設定**：使用するユーザーまたはGoogleグループのメールアドレスを追加
 
 ### 4. Google ChatにBotを追加
 
-スペースの「アプリと統合」→「アプリを追加」で Gyazo Bot を検索して追加。
+スペースの「アプリと統合」→「アプリを追加」でpreviewを検索して追加。
 
 ## appsscript.json
 
@@ -59,4 +66,9 @@ Google ChatでGyazoのURLを貼ると画像をプレビュー表示するBot。G
 
 - テストデプロイはコードを変更しても再デプロイ不要で常に最新を参照します
 - 公開設定にGoogleグループのアドレスを指定すると複数ユーザーへの一括付与が可能です
-- リンクプレビューはGoogle Chatの仕様上1メッセージ1URLのみ。複数URLは `/gyazo` または `@Gyazo Bot` を使ってください
+- リンクプレビューはGoogle Chatの仕様上1メッセージ1URLのみ。複数URLや、リンクプレビューに登録していないサイトは`/preview`または`@preview`を使ってください
+- スラッシュコマンドはコマンドIDを見ていないので、名前を`/gyazo`のままにしても動きます
+- `/preview`で投稿し直したメッセージには、送信者の名前とあわせてアプリ名が表示されます。投稿し直せなかったときは、カードに本文を添えて返します
+- Xの本文は公式のoEmbedで取得します。添付画像は表示されず、鍵アカウントや削除済みの投稿は展開しません
+- 自動アクセスを拒否するサイト（medium.comなど）は展開できません
+- `google.com`のURLはGoogle Chatが自前で展開するので無視します
